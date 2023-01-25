@@ -175,6 +175,10 @@ pub trait DiscordIpc {
         });
         self.send(data, 1)?;
 
+        if let Ok((_, Event::Error { code, message })) = self.recv() {
+            return Err(format!("{code} : {message}").into());
+        }
+
         Ok(())
     }
 
