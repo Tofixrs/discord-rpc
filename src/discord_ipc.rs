@@ -1,5 +1,6 @@
 use crate::{
     activity::Activity,
+    event::Event,
     pack_unpack::{pack, unpack},
 };
 use serde_json::{json, Value};
@@ -28,7 +29,7 @@ pub trait DiscordIpc {
     /// let mut client = discord_rich_presence::new_client("<some client id>")?;
     /// client.connect()?;
     /// ```
-    fn connect(&mut self, ipc: Option<u8>) -> Result<()> {
+    fn connect(&mut self, ipc: Option<u8>) -> Result<Event> {
         self.connect_ipc(ipc)?;
         self.send_handshake()
     }
@@ -52,7 +53,7 @@ pub trait DiscordIpc {
     /// client.close()?;
     /// client.reconnect()?;
     /// ```
-    fn reconnect(&mut self, ipc: Option<u8>) -> Result<()> {
+    fn reconnect(&mut self, ipc: Option<u8>) -> Result<Event> {
         self.close()?;
         self.connect_ipc(ipc)?;
         self.send_handshake()
@@ -76,7 +77,7 @@ pub trait DiscordIpc {
     /// # Errors
     ///
     /// Returns an `Err` variant if sending the handshake failed.
-    fn send_handshake(&mut self) -> Result<()> {
+    fn send_handshake(&mut self) -> Result<Event> {
         self.send(
             json!({
                 "v": 1,
@@ -84,10 +85,13 @@ pub trait DiscordIpc {
             }),
             0,
         )?;
-        // TODO: Return an Err if the handshake is rejected
-        self.recv()?;
 
-        Ok(())
+        let (_, evt) = self.recv()?;
+        if let Event::Error { code, message } = evt {
+            return Err(format!("{code} : {message}").into());
+        }
+
+        Ok(evt)
     }
 
     /// Sends JSON data to the Discord IPC.
@@ -132,7 +136,7 @@ pub trait DiscordIpc {
     ///
     /// println!("{:?}", client.recv()?);
     /// ```
-    fn recv(&mut self) -> Result<(u32, Value)> {
+    fn recv(&mut self) -> Result<(u32, Event)> {
         let mut header = [0; 8];
 
         self.read(&mut header)?;
@@ -142,9 +146,9 @@ pub trait DiscordIpc {
         self.read(&mut data)?;
 
         let response = String::from_utf8(data.to_vec())?;
-        let json_data = serde_json::from_str::<Value>(&response)?;
+        let event = serde_json::from_str::<Event>(&response)?;
 
-        Ok((op, json_data))
+        Ok((op, event))
     }
 
     #[doc(hidden)]

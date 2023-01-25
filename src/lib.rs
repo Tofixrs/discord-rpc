@@ -20,6 +20,7 @@
 #![deny(missing_docs)]
 
 mod discord_ipc;
+mod event;
 mod pack_unpack;
 pub use discord_ipc::*;
 pub mod activity;
