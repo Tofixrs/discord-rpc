@@ -1,6 +1,6 @@
 use crate::{
     activity::Activity,
-    event::Event,
+    event::{Event, SocketError},
     pack_unpack::{pack, unpack},
 };
 use serde_json::{json, Value};
@@ -146,7 +146,13 @@ pub trait DiscordIpc {
         self.read(&mut data)?;
 
         let response = String::from_utf8(data.to_vec())?;
-        let event = serde_json::from_str::<Event>(&response)?;
+        let event: Event = match serde_json::from_str::<Event>(&response) {
+            Ok(evt) => Ok::<Event, Box<dyn Error>>(evt),
+            Err(_) => match serde_json::from_str::<SocketError>(&response) {
+                Ok(err) => Err(format!("{}: {}", err.code, err.message).into()),
+                Err(_) => Err("Failed to parse event".into()),
+            },
+        }?;
 
         Ok((op, event))
     }

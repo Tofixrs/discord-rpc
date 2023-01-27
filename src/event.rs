@@ -15,6 +15,13 @@ pub enum Event {
     },
 }
 
+///DISCORD WHY
+#[derive(Debug, Deserialize)]
+pub struct SocketError {
+    pub code: i32,
+    pub message: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ReadyConfig {
     pub cdn_host: String,
