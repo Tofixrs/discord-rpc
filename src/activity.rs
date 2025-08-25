@@ -10,37 +10,37 @@ use serde_repr::Serialize_repr;
 #[derive(Serialize, Clone)]
 pub struct Activity<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    state: Option<&'a str>,
+    pub state: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    state_url: Option<&'a str>,
+    pub state_url: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    details: Option<&'a str>,
+    pub details: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    details_url: Option<&'a str>,
+    pub details_url: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    timestamps: Option<Timestamps>,
+    pub timestamps: Option<Timestamps>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    party: Option<Party<'a>>,
+    pub party: Option<Party<'a>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    assets: Option<Assets<'a>>,
+    pub assets: Option<Assets<'a>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    secrets: Option<Secrets<'a>>,
+    pub secrets: Option<Secrets<'a>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    buttons: Option<Vec<Button<'a>>>,
+    pub buttons: Option<Vec<Button<'a>>>,
 
     #[serde(skip_serializing_if = "Option::is_none", rename = "type")]
-    activity_type: Option<ActivityType>,
+    pub activity_type: Option<ActivityType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    status_display_type: Option<StatusDisplayType>,
+    pub status_display_type: Option<StatusDisplayType>,
 }
 
 /// A struct representing an `Activity`'s timestamps
@@ -50,10 +50,10 @@ pub struct Activity<'a> {
 #[derive(Serialize, Clone)]
 pub struct Timestamps {
     #[serde(skip_serializing_if = "Option::is_none")]
-    start: Option<i64>,
+    pub start: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<i64>,
+    pub end: Option<i64>,
 }
 
 /// A struct representing an `Activity`'s game party
@@ -63,10 +63,10 @@ pub struct Timestamps {
 #[derive(Serialize, Clone)]
 pub struct Party<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<&'a str>,
+    pub id: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    size: Option<[i32; 2]>,
+    pub size: Option<[i32; 2]>,
 }
 
 /// A struct representing the art assets and hover text
@@ -77,16 +77,16 @@ pub struct Party<'a> {
 #[derive(Serialize, Clone)]
 pub struct Assets<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    large_image: Option<&'a str>,
+    pub large_image: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    large_text: Option<&'a str>,
+    pub large_text: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    small_image: Option<&'a str>,
+    pub small_image: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    small_text: Option<&'a str>,
+    pub small_text: Option<&'a str>,
 }
 
 /// A struct representing the secrets used by an
@@ -97,13 +97,13 @@ pub struct Assets<'a> {
 #[derive(Serialize, Clone)]
 pub struct Secrets<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    join: Option<&'a str>,
+    pub join: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    spectate: Option<&'a str>,
+    pub spectate: Option<&'a str>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    r#match: Option<&'a str>,
+    pub r#match: Option<&'a str>,
 }
 
 /// A struct representing the buttons that are
@@ -112,12 +112,12 @@ pub struct Secrets<'a> {
 /// An activity may have a maximum of 2 buttons
 #[derive(Serialize, Clone)]
 pub struct Button<'a> {
-    label: &'a str,
-    url: &'a str,
+    pub label: &'a str,
+    pub url: &'a str,
 }
 
 /// A struct to set the Activity Type of the `Activity`
-#[derive(Serialize_repr, Clone)]
+#[derive(Serialize_repr, Clone, Debug, Hash, Eq, PartialEq)]
 #[repr(u8)]
 pub enum ActivityType {
     /// Activity type "Playing X"
@@ -128,6 +128,19 @@ pub enum ActivityType {
     Watching = 3,
     /// Activity type "Competing in X"
     Competing = 5,
+}
+
+impl std::fmt::Display for ActivityType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let out = match self {
+            Self::Playing => "Playing",
+            Self::Listening => "Listening",
+            Self::Watching => "Watching",
+            Self::Competing => "Competing",
+        };
+
+        write!(f, "{}", out)
+    }
 }
 
 /// A struct to set the Status Display Type of the `Activity`
@@ -160,80 +173,6 @@ impl<'a> Activity<'a> {
             status_display_type: None,
         }
     }
-
-    /// Sets the state of the activity
-    pub fn state(mut self, state: &'a str) -> Self {
-        self.state = Some(state);
-        self
-    }
-
-    /// Sets the state URL of the activity
-    pub fn state_url(mut self, state_url: &'a str) -> Self {
-        self.state_url = Some(state_url);
-        self
-    }
-
-    /// Sets the details of the activity
-    pub fn details(mut self, details: &'a str) -> Self {
-        self.details = Some(details);
-        self
-    }
-
-    /// Sets the details URL of the activity
-    pub fn details_url(mut self, details_url: &'a str) -> Self {
-        self.details_url = Some(details_url);
-        self
-    }
-
-    /// Add a `Timestamps` to this activity
-    pub fn timestamps(mut self, timestamps: Timestamps) -> Self {
-        self.timestamps = Some(timestamps);
-        self
-    }
-
-    /// Add a `Party` to this activity
-    pub fn party(mut self, party: Party<'a>) -> Self {
-        self.party = Some(party);
-        self
-    }
-
-    /// Add an `Assets` to this activity
-    pub fn assets(mut self, assets: Assets<'a>) -> Self {
-        self.assets = Some(assets);
-        self
-    }
-
-    /// Add a `Secrets` to this activity
-    pub fn secrets(mut self, secrets: Secrets<'a>) -> Self {
-        self.secrets = Some(secrets);
-        self
-    }
-
-    /// Add a `Vec` of `Button`s to this activity
-    ///
-    /// An activity may contain no more than 2 buttons
-    pub fn buttons(mut self, buttons: Vec<Button<'a>>) -> Self {
-        // API call fails if the array is empty, so we skip serialization
-        // entirely if this is the case
-        if buttons.is_empty() {
-            return self;
-        }
-
-        self.buttons = Some(buttons);
-        self
-    }
-
-    /// Add an `ActivityType` to this activity
-    pub fn activity_type(mut self, activity_type: ActivityType) -> Self {
-        self.activity_type = Some(activity_type);
-        self
-    }
-
-    /// Add a `StatusDisplayType` to this activity
-    pub fn status_display_type(mut self, status_display_type: StatusDisplayType) -> Self {
-        self.status_display_type = Some(status_display_type);
-        self
-    }
 }
 
 impl<'a> Default for Activity<'a> {
@@ -250,18 +189,6 @@ impl Timestamps {
             end: None,
         }
     }
-
-    /// Sets the start time
-    pub fn start(mut self, start: i64) -> Self {
-        self.start = Some(start);
-        self
-    }
-
-    /// Sets the end time
-    pub fn end(mut self, end: i64) -> Self {
-        self.end = Some(end);
-        self
-    }
 }
 
 impl Default for Timestamps {
@@ -277,25 +204,6 @@ impl<'a> Party<'a> {
             id: None,
             size: None,
         }
-    }
-
-    /// Sets the ID of the party
-    pub fn id(mut self, id: &'a str) -> Self {
-        self.id = Some(id);
-        self
-    }
-
-    /// Sets the size of the party (current and maximum)
-    ///
-    /// # Example
-    /// ```
-    /// // Creates a party with a current size
-    /// // of 1, and a max size of 3
-    /// let party = Party::new().size([1, 3])
-    /// ```
-    pub fn size(mut self, size: [i32; 2]) -> Self {
-        self.size = Some(size);
-        self
     }
 }
 
@@ -315,40 +223,6 @@ impl<'a> Assets<'a> {
             small_text: None,
         }
     }
-
-    /// Sets the name of the art asset to be used as the large
-    /// image
-    ///
-    /// Alternatively, the URL of the resource to be used as
-    /// the large image
-    pub fn large_image(mut self, large_image: &'a str) -> Self {
-        self.large_image = Some(large_image);
-        self
-    }
-
-    /// Sets the text to be shown when hovering over the large
-    /// image
-    pub fn large_text(mut self, large_text: &'a str) -> Self {
-        self.large_text = Some(large_text);
-        self
-    }
-
-    /// Sets the name of the art asset to be used as the small
-    /// image
-    ///
-    /// Alternatively, the URL of the resource to be used as
-    /// the small image
-    pub fn small_image(mut self, small_image: &'a str) -> Self {
-        self.small_image = Some(small_image);
-        self
-    }
-
-    /// Sets the text that is shown when hovering over the small
-    /// image
-    pub fn small_text(mut self, small_text: &'a str) -> Self {
-        self.small_text = Some(small_text);
-        self
-    }
 }
 
 impl<'a> Default for Assets<'a> {
@@ -365,24 +239,6 @@ impl<'a> Secrets<'a> {
             spectate: None,
             r#match: None,
         }
-    }
-
-    /// Sets the secret for joining a game party
-    pub fn join(mut self, join: &'a str) -> Self {
-        self.join = Some(join);
-        self
-    }
-
-    /// Sets the secret for spectating a match
-    pub fn spectate(mut self, spectate: &'a str) -> Self {
-        self.spectate = Some(spectate);
-        self
-    }
-
-    /// Sets the secret for a specific, instanced match
-    pub fn r#match(mut self, r#match: &'a str) -> Self {
-        self.r#match = Some(r#match);
-        self
     }
 }
 

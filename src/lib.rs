@@ -17,7 +17,6 @@
 //!     client.set_activity(payload)?;
 //! }
 //! ```
-#![deny(missing_docs)]
 
 mod discord_ipc;
 mod pack_unpack;
