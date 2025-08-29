@@ -1,7 +1,7 @@
 //! Provides an interface for building activities to send
 //! to Discord via [`DiscordIpc::set_activity`](crate::DiscordIpc::set_activity).
 use serde_derive::Serialize;
-use serde_repr::Serialize_repr;
+use serde_repr::{Serialize_repr, Deserialize_repr};
 
 /// A struct representing a Discord rich presence activity
 ///
@@ -117,7 +117,7 @@ pub struct Button<'a> {
 }
 
 /// A struct to set the Activity Type of the `Activity`
-#[derive(Serialize_repr, Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Serialize_repr,Deserialize_repr Clone, Debug, Hash, Eq, PartialEq)]
 #[repr(u8)]
 pub enum ActivityType {
     /// Activity type "Playing X"
