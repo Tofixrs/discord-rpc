@@ -117,7 +117,7 @@ pub struct Button<'a> {
 }
 
 /// A struct to set the Activity Type of the `Activity`
-#[derive(Serialize_repr,Deserialize_repr Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Serialize_repr,Deserialize_repr, Clone, Debug, Hash, Eq, PartialEq)]
 #[repr(u8)]
 pub enum ActivityType {
     /// Activity type "Playing X"
