@@ -23,6 +23,7 @@ mod pack_unpack;
 pub use discord_ipc::*;
 pub mod activity;
 pub mod error;
+pub mod event;
 
 #[cfg(unix)]
 mod ipc_unix;

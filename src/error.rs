@@ -34,4 +34,6 @@ pub enum Error {
     /// Failed to flush IPC socket.
     #[error("failed to flush IPC socket")]
     FlushError(std::io::Error),
+    #[error("IPCError {code}: {message}")]
+    IPCError{ code: i32, message: String }
 }
