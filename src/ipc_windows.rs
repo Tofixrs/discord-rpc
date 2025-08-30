@@ -38,13 +38,17 @@ impl DiscordIpc for DiscordIpcClient {
     fn connect_ipc(&mut self) -> Result<()> {
         for i in 0..10 {
             let path = PathBuf::from(format!(r"\\?\pipe\discord-ipc-{}", i));
+            log::debug!("connect_ipc: {}", path.display());
 
             match OpenOptions::new().access_mode(0x3).open(&path) {
                 Ok(handle) => {
                     self.socket = Some(handle);
                     return Ok(());
                 }
-                Err(_) => continue,
+                Err(err) => {
+                    log::debug!("connect_ipc: {}", err);
+                    continue;
+                },
             }
         }
 
